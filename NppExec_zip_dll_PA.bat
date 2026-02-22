@@ -1,7 +1,7 @@
 REM Creates an archive with PluginsAdmin-specific folder structure
 REM (starting from Notepad++ 7.6.x)
 
-set USE_CHM_MANUAL=1
+set USE_CHM_MANUAL=0
 set ARC_EXE=7z.exe
 
 for /f "tokens=1-3 delims=/.- " %%a in ('DATE /T') do set ARC_DATE=%%c%%b%%a

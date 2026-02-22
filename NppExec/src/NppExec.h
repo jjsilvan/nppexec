@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Glory to Ukraine! Glory to the heroes!
  + added: $(IS_CONSOLE), $(IS_CONSOLE0)
  + NppExec Manual updated
+ * the CHM version of NppExec Manual is replaced with the HTML version
 
 
  v0.8.10 - October 2025

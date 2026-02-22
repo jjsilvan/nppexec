@@ -1,6 +1,6 @@
 @echo off
 
-set USE_CHM_MANUAL=1
+set USE_CHM_MANUAL=0
 set ARC_EXE=7z.exe
 
 for /f "tokens=1-3 delims=/.- " %%a in ('DATE /T') do set ARC_DATE=%%c%%b%%a

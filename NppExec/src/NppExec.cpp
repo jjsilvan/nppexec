@@ -283,7 +283,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <CommCtrl.h>
 
-#define USE_CHM_MANUAL 1
+// 1 - CHM, 0 - HTML
+#define USE_CHM_MANUAL 0
 
 #define  MAX_PLUGIN_NAME  60
 TCHAR PLUGIN_NAME[MAX_PLUGIN_NAME] = _T("NppExec");
