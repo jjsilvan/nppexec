@@ -1,7 +1,7 @@
 
  ****************************************************************************
- * NppExec plugin ver. 0.8.10 for Notepad++
- * by DV <dvv81 @ ukr.net>, December 2006 - October 2025
+ * NppExec plugin ver. 0.8.11 for Notepad++
+ * by DV <dvv81 @ ukr.net>, December 2006 - February 2026
  * https://github.com/d0vgan/nppexec
  * Powered by Function Parser (C) Juha Nieminen, Joel Yliluoma
  *
@@ -206,6 +206,8 @@
  *        $(EXITCODE)           : exit code of the last executed child process
  *        $(PID)                : process id of the current (or the last) child process
  *        $(IS_PROCESS)         : is child process running (1 - yes, 0 - no)
+ *        $(IS_CONSOLE)         : is NppExec's Console visible (1 - yes, 0 - no)
+ *        $(IS_CONSOLE0)        : was the Console visible when the script has started
  *        $(LAST_CMD_RESULT)    : result of the last NppExec's command
  *                                  (1 - succeeded, 0 - failed, -1 - invalid arg)
  *        $(MSG_RESULT)         : result of 'npp_sendmsg[ex]' or 'sci_sendmsg'
@@ -246,6 +248,13 @@
  *************
  *  HISTORY  *
  *************
+
+ v0.8.11 - February 2026
+ -----------------------
+ * Glory to Ukraine! Glory to the heroes!
+ + added: $(IS_CONSOLE), $(IS_CONSOLE0)
+ + NppExec Manual updated
+
 
  v0.8.10 - October 2025
  ----------------------
@@ -992,7 +1001,7 @@
  ----------------------
  - fixed: buffer size was not checked before calling OemToChar()
  - fixed/added: '\b' and '\r' handling
- + a lot of changes in plugin's internals (basic cpp-classes and NppExecEngine)
+ + a lot of changes in plugin's internals (basic cpp-classes and NppExecScriptEngine)
  + new command: cd, cd <path>, cd <drive:\path>
  + new command: dir, dir <mask>, dir <path\mask>
  + new feature: npp_open <mask>, npp_open <path\mask>

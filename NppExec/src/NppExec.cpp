@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /****************************************************************************
- * NppExec plugin ver. 0.8.10 for Notepad++
- * by DV <dvv81 @ ukr.net>, December 2006 - October 2025
+ * NppExec plugin ver. 0.8.11 for Notepad++
+ * by DV <dvv81 @ ukr.net>, December 2006 - February 2026
  * https://github.com/d0vgan/nppexec
  * Powered by Function Parser (C) Juha Nieminen, Joel Yliluoma
  *
@@ -223,6 +223,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *        $(EXITCODE)           : exit code of the last executed child process
  *        $(PID)                : process id of the current (or the last) child process
  *        $(IS_PROCESS)         : is child process running (1 - yes, 0 - no)
+ *        $(IS_CONSOLE)         : is NppExec's Console visible (1 - yes, 0 - no)
+ *        $(IS_CONSOLE0)        : was the Console visible when the script has started
  *        $(LAST_CMD_RESULT)    : result of the last NppExec's command
  *                                  (1 - succeeded, 0 - failed, -1 - invalid arg)
  *        $(MSG_RESULT)         : result of 'npp_sendmsg[ex]' or 'sci_sendmsg'
@@ -249,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define _TEST_ONLY_
 
 #include "NppExec.h"
-#include "NppExecEngine.h"
+#include "NppExecScriptEngine.h"
 #include "ChildProcess.h"
 #include "resource.h"
 #include "DlgDoExec.h"
@@ -398,7 +400,7 @@ const CStaticOptionsManager::OPT_ITEM optArray[OPT_COUNT] = {
       DEFAULT_SENDMSG_MAXBUFLEN, NULL },
     { OPTS_CALC_PRECISION, OPTT_STR | OPTF_READWRITE,
       INI_SECTION_CONSOLE, _T("Calc_Precision"),
-      0, NULL }, // see "NppExecEngine.cpp", calc_precision
+      0, NULL }, // see "NppExecScriptEngine.cpp", calc_precision
     { OPTS_COMMENTDELIMITER, OPTT_STR | OPTF_READWRITE, 
       INI_SECTION_CONSOLE, _T("CommentDelimiter"), 
       0, DEFAULT_COMMENTDELIMITER },
@@ -3659,8 +3661,13 @@ void CNppExec::DoExecText(const tstr& sText, unsigned int nExecTextMode)
 
     if ( isCollateral )
     {
-        if ( checkCmdListAndPrepareConsole(CmdList, false) )
+        const UINT uCheck = checkCmdListAndPrepareConsole(CmdList, false);
+        if ( uCheck )
         {
+            if ( uCheck & IScriptEngine::rfConsoleIsVisible )
+            {
+                nRunFlags |= IScriptEngine::rfConsoleIsVisible;
+            }
             if ( nCmdFlags & CScriptEngine::acfKeepLineEndings )
             {
                 CScriptEngine::removeLineEndings(CmdList);
@@ -3696,8 +3703,13 @@ void CNppExec::DoExecText(const tstr& sText, unsigned int nExecTextMode)
     }
     else
     {
-        if ( checkCmdListAndPrepareConsole(CmdList, false) )
+        const UINT uCheck = checkCmdListAndPrepareConsole(CmdList, false);
+        if ( uCheck )
         {
+            if ( uCheck & IScriptEngine::rfConsoleIsVisible )
+            {
+                nRunFlags |= IScriptEngine::rfConsoleIsVisible;
+            }
             if ( nExecTextMode & etfLastScript )
             {
                 SetCmdList(CmdList);
@@ -5135,12 +5147,19 @@ CNppExec::eDlgExistResult CNppExec::verifyConsoleDialogExists()
     return result;
 }
 
-bool CNppExec::isConsoleDialogVisible()
+bool CNppExec::isConsoleDialogVisible() const
 {
-    if ( GetConsole().GetDialogWnd() )
-        return ::IsWindowVisible(GetConsole().GetDialogWnd()) ? true : false;
+    const HWND hConDlgWnd = GetConsole().GetDialogWnd();
+    if ( hConDlgWnd )
+        return (::IsWindowVisible(hConDlgWnd) != FALSE);
     else
         return _consoleIsVisible;
+}
+
+bool CNppExec::isConsoleDialogCurrentlyVisible() const
+{
+    const HWND hConDlgWnd = GetConsole().GetDialogWnd();
+    return (hConDlgWnd != NULL && ::IsWindowVisible(hConDlgWnd) != FALSE);
 }
 
 bool CNppExec::initConsoleDialog()
@@ -5175,7 +5194,7 @@ bool CNppExec::initConsoleDialog()
     return (verifyConsoleDialogExists() != dlgNotExist);
 }
 
-bool CNppExec::checkCmdListAndPrepareConsole(const CListT<tstr>& CmdList, bool bCanClearConsole)
+UINT CNppExec::checkCmdListAndPrepareConsole(const CListT<tstr>& CmdList, bool bCanClearConsole)
 {
     tstr S;
     bool bExecute = false;
@@ -5193,9 +5212,14 @@ bool CNppExec::checkCmdListAndPrepareConsole(const CListT<tstr>& CmdList, bool b
         }
         p = p->GetNext();
     }
-     
+
     if ( bExecute )
     {
+        UINT uResult = 1;
+
+        if ( isConsoleDialogCurrentlyVisible() )
+            uResult |= IScriptEngine::rfConsoleIsVisible;
+
         const CScriptEngine::eCmdType cmdType = CScriptEngine::getCmdType(this, nullptr, S, CScriptEngine::ctfUseLogging | CScriptEngine::ctfIgnorePrefix);
         if ( (cmdType == CScriptEngine::CMDTYPE_NPPCONSOLE) ||
              (cmdType == CScriptEngine::CMDTYPE_NPPEXEC) )
@@ -5217,11 +5241,11 @@ bool CNppExec::checkCmdListAndPrepareConsole(const CListT<tstr>& CmdList, bool b
                     GetConsole().ClearText();
                 }
             }
-            return true;
+            return uResult;
         }
     }
 
-    return false;
+    return 0;
 }
 
 void CNppExec::showConsoleDialog(eShowConsoleAction showAction, unsigned int nShowFlags)
