@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  + added: $(IS_CONSOLE), $(IS_CONSOLE0)
  + NppExec Manual updated
  * the CHM version of NppExec Manual is replaced with the HTML version
+ * vc2026 project files with arm64 added, thanks to jjsilvan
 
 
  v0.8.10 - October 2025
