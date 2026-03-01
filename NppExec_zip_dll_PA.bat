@@ -40,6 +40,7 @@ copy Release\NppExec\*.h %TMP_DIR%\NppExec\NppExec\
 
 set ARC_DLL_NAME=NppExec%ARC_DATE%_dll_PA
 set ARC_DLL_NAME_64=NppExec%ARC_DATE%_dll_x64_PA
+set ARC_DLL_NAME_ARM64=NppExec%ARC_DATE%_dll_arm64_PA
 
 :check_dll_32bit
 if not exist Release\NppExec.dll goto check_dll_64bit
@@ -50,12 +51,20 @@ if exist ..\%ARC_DLL_NAME%.zip del /Q ..\%ARC_DLL_NAME%.zip
 %ARC_EXE% t ..\%ARC_DLL_NAME%.zip
 
 :check_dll_64bit
-if not exist x64\Release\NppExec.dll goto finish
+if not exist x64\Release\NppExec.dll goto check_dll_arm64bit
 copy x64\Release\NppExec.dll %TMP_DIR%\NppExec\ /Y
 
 if exist ..\%ARC_DLL_NAME_64%.zip del /Q ..\%ARC_DLL_NAME_64%.zip
 %ARC_EXE% a -tzip ..\%ARC_DLL_NAME_64%.zip %TMP_DIR%\* -mx5
 %ARC_EXE% t ..\%ARC_DLL_NAME_64%.zip
+
+:check_dll_arm64bit
+if not exist arm64\Release\NppExec.dll goto finish
+copy arm64\Release\NppExec.dll %TMP_DIR%\NppExec\ /Y
+
+if exist ..\%ARC_DLL_NAME_ARM64%.zip del /Q ..\%ARC_DLL_NAME_ARM64%.zip
+%ARC_EXE% a -tzip ..\%ARC_DLL_NAME_ARM64%.zip %TMP_DIR%\* -mx5
+%ARC_EXE% t ..\%ARC_DLL_NAME_ARM64%.zip
 
 :finish
 if exist %TMP_DIR% del /S /Q %TMP_DIR%
