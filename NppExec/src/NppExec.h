@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * NppExec History:
  ****************************************************************************
 
- v0.8.11 - February 2026
- -----------------------
+ v0.8.11 - March 2026
+ --------------------
  * Glory to Ukraine! Glory to the heroes!
  + added: $(IS_CONSOLE), $(IS_CONSOLE0)
  + NppExec Manual updated
